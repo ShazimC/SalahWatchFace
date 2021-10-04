@@ -92,14 +92,14 @@
         return urlWithParams;
     }
 
-    function updateSalah({ lat, long }) {
+    function updateSalah({ lat, lon }) {
         var salahText = document.querySelector('#salah-status');
         salahText.innerHTML = "Updating..";
 
         var req = new XMLHttpRequest();
         var apiURL = addParamsToUrl('http://api.aladhan.com/v1/calendar', {
             latitude: lat,
-            longitude: long,
+            longitude: lon,
             school: 1
         });
 
@@ -160,8 +160,34 @@
      * @param {{number}} lat the latitude of the geolocation.
      * @param {{number}} long the longitude of the geolocation.
      */
-    function updateWeather({lat, long}) {
+    function updateWeather({lat, lon}) {
+        var weatherText = document.querySelector('#weather-text');
+
         //make api request to some weather api using coordinates
+        var req = new XMLHttpRequest();
+        var apiURL = addParamsToUrl('http://api.openweathermap.org/data/2.5/weather', {
+            lat, lon,
+            appid: '42adc1f5752b2d26823d3349379d0339'
+        });
+
+        req.overrideMimeType("application/json");
+        req.open("GET", apiURL, false);
+        req.onreadystatechange = function () {
+            if (req.responseText) {
+                var res = JSON.parse(req.responseText)
+                var weather = res.weather[0].main;
+                var temp = convertTemp(res.main.temp);
+                weatherText.innerHTML = weather + ' ' + temp + '\u00B0F';
+            } else {
+                weatherText.innerHTML = ':(';
+            }
+        }
+        req.send();
+    }
+
+    function convertTemp(k = 0){
+        //Fahrenheit
+        return (1.8 * (k - 273) + 32).toFixed(1);
     }
 
     /**
@@ -185,7 +211,7 @@
     }
 
     /**
-     * Update weather and air pollution information.
+     * Update salah, weather information.
      * If can't get location information, displays no GPS icon.
      * @private
      */
@@ -194,12 +220,12 @@
             function (pos) {
                 updateSalah({
                     lat: pos.coords.latitude,
-                    long: pos.coords.longitude
+                    lon: pos.coords.longitude
                 });
-                // updateWeather({
-                //     lat: pos.coords.latitude,
-                //     long: pos.coords.longitude
-                // });
+                updateWeather({
+                    lat: pos.coords.latitude,
+                    lon: pos.coords.longitude
+                });
             }
         );
     }
