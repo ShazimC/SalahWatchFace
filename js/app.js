@@ -82,6 +82,12 @@
         }, nextInterval);
     }
 
+    /**
+     * Adds query parameters to a base api url.
+     * @param {string} url base url to add parameters to
+     * @param {object} queryParams query parameters to add to base url
+     * @returns the url with query parameters attached.
+     */
     function addParamsToUrl(url = '', queryParams = {}){
         var urlWithParams = url+'?'; 
         for (var param in queryParams) {
@@ -92,6 +98,11 @@
         return urlWithParams;
     }
 
+    /**
+     * Updates displayed salah time based on given geolocation coordinates.
+     * @param {{number, number}} lat the latitude of the geolocation.
+     * @param {{number, number}} long the longitude of the geolocation.
+     */
     function updateSalah({ lat, lon }) {
         var salahText = document.querySelector('#salah-status');
         salahText.innerHTML = "Updating..";
@@ -119,6 +130,13 @@
         req.send();
     }
 
+    /**
+     * Gets the correct next salah time using system time and
+     * fetched salah timings.
+     * @param {Date} now date object for the latest system time
+     * @param {object} timings fetched salah timings for today
+     * @returns {string} formatted, next salah time.
+     */
     function getSalahText(now = new Date(), timings = {}){
         var output = 'error';
         if(timings && typeof timings === "object"){
@@ -146,6 +164,12 @@
         return output;
     }
 
+    /**
+     * Takes in a Date object and formats it to a string
+     * only holding hour, minutes and am/pm.
+     * @param {Date} time date object to format
+     * @returns 
+     */
     function formatTime(time = new Date()){
         var timeStr = time.toLocaleTimeString();
         var lastColon = timeStr.lastIndexOf(':');
@@ -157,8 +181,8 @@
 
     /**
      * Updates displayed weather temperature based on given geolocation coordinates.
-     * @param {{number}} lat the latitude of the geolocation.
-     * @param {{number}} long the longitude of the geolocation.
+     * @param {{number, number}} lat the latitude of the geolocation.
+     * @param {{number, number}} long the longitude of the geolocation.
      */
     function updateWeather({lat, lon}) {
         var weatherText = document.querySelector('#weather-text');
@@ -169,6 +193,7 @@
             lat, lon,
             appid: '42adc1f5752b2d26823d3349379d0339'
         });
+        // replace appid with your own
 
         req.overrideMimeType("application/json");
         req.open("GET", apiURL, false);
@@ -185,8 +210,12 @@
         req.send();
     }
 
+    /**
+     * Converts kelvin to fahrenheit
+     * @param {number} k temperature in kelvin to convert
+     * @returns Temperature in fahrenheit.
+     */
     function convertTemp(k = 0){
-        //Fahrenheit
         return (1.8 * (k - 273) + 32).toFixed(1);
     }
 
